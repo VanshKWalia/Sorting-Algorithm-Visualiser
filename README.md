@@ -1,5 +1,8 @@
 # 🔥 Sort.viz — Sorting Algorithm Visualizer
 
+🌐 Live Demo
+👉 https://vansh-sortviz.netlify.app
+
 An interactive and advanced Sorting Algorithm Visualizer with real-time animations built using **HTML, CSS, and JavaScript**.
 
 ## 🚀 Features
