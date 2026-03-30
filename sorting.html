@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sort.viz — Fixed Array Value Labels</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080b0f; --surface: #0e1318; --surface2: #141a22; --border: #1e2936;
+    --text: #c9d1d9; --muted: #5a6a7a; --accent: #4fa3d4;
+    --primary: #2a6496; --active: #e05252; --sorted: #3d9e6e; --pivot: #c8922a;
+    --font: 'JetBrains Mono', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; display: flex; flex-direction: column; }
+
+  header { padding: 18px 32px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .logo { font-size: 13px; font-weight: 700; letter-spacing: .2em; color: var(--accent); text-transform: uppercase; }
+
+  /* Controls */
+  .controls { display: flex; flex-wrap: wrap; gap: 20px; padding: 16px 32px; border-bottom: 1px solid var(--border); align-items: flex-end; background: var(--surface); }
+  .ctrl-group { display: flex; flex-direction: column; gap: 8px; }
+  .ctrl-group label { font-size: 9px; letter-spacing: .12em; color: var(--muted); text-transform: uppercase; }
+
+  .legend { display: flex; gap: 12px; background: var(--surface2); padding: 8px 12px; border: 1px solid var(--border); border-radius: 2px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 9px; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; }
+
+  input[type="text"] { background: var(--surface2); border: 1px solid var(--border); color: var(--text); font-family: var(--font); font-size: 11px; padding: 8px 12px; width: 180px; outline: none; }
+  .algo-checkboxes { display: flex; gap: 6px; }
+  .algo-check { padding: 6px 12px; border: 1px solid var(--border); font-size: 9px; cursor: pointer; background: var(--surface2); color: var(--muted); border-radius: 2px; }
+  .algo-check.active { border-color: var(--accent); color: var(--accent); }
+
+  input[type="range"] { -webkit-appearance: none; width: 80px; height: 2px; background: var(--border); outline: none; margin-bottom: 12px; }
+  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 10px; height: 10px; background: var(--accent); border-radius: 50%; }
+
+  .btn { font-family: var(--font); font-size: 10px; font-weight: 700; padding: 8px 14px; cursor: pointer; border: 1px solid; background: transparent; text-transform: uppercase; border-radius: 2px; transition: 0.2s; }
+  .btn-run { border-color: var(--accent); color: var(--accent); }
+  .btn-run:hover { background: var(--accent); color: #000; }
+  .btn-rand { border-color: var(--border); color: var(--muted); }
+  .btn-rand:hover { color: #fff; border-color: #fff; }
+
+  /* Grid Layout */
+  .vis-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); flex: 1; overflow-y: auto; }
+  .grid-section-title { grid-column: 1 / -1; background: var(--surface2); padding: 6px 32px; font-size: 9px; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid var(--border); }
+  .algo-panel { background: var(--surface); display: flex; flex-direction: column; min-height: 250px; }
+  .algo-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; border-bottom: 1px solid var(--border); }
+  .algo-name { font-size: 11px; font-weight: 700; color: #fff; }
+  .algo-complexity { font-size: 9px; color: var(--muted); }
+  .algo-complexity span { color: var(--accent); }
+  .algo-stats { padding: 6px 16px; font-size: 9px; color: var(--muted); border-bottom: 1px solid var(--border); display: flex; gap: 15px; }
+  canvas { width: 100%; flex: 1; display: block; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">// Sort.viz</div>
+  <div style="font-size: 9px; color: var(--muted); border: 1px solid var(--border); padding: 4px 10px;">VANSH · DTU · CSE</div>
+</header>
+
+<div class="controls">
+  <div class="ctrl-group">
+    <label>Input Array</label>
+    <input type="text" id="arr-input" value="45 23 89 12 56 34 78 9 67 21">
+  </div>
+  <div class="ctrl-group">
+    <label>Color Guide</label>
+    <div class="legend">
+      <div class="legend-item"><span class="dot" style="background:var(--primary)"></span> Default</div>
+      <div class="legend-item"><span class="dot" style="background:var(--active)"></span> Swap</div>
+      <div class="legend-item"><span class="dot" style="background:var(--pivot)"></span> Pivot</div>
+      <div class="legend-item"><span class="dot" style="background:var(--sorted)"></span> Sorted</div>
+    </div>
+  </div>
+  <div class="ctrl-group">
+    <label>Algorithms</label>
+    <div class="algo-checkboxes" id="algo-checks"></div>
+  </div>
+  <div class="ctrl-group">
+    <label>Speed: <span id="speed-val" style="color:var(--accent)">Mid</span></label>
+    <input type="range" id="speed" min="1" max="10" value="5">
+  </div>
+  <div class="ctrl-group">
+    <div style="display:flex; gap:6px;">
+      <button class="btn btn-rand" onclick="randomize()">Random</button>
+      <button class="btn btn-run" id="run-btn" onclick="runAll()">▶ Run</button>
+    </div>
+  </div>
+</div>
+
+<div class="vis-grid" id="vis-grid"></div>
+
+<script>
+const ALGO_DETAILS = {
+  Bubble:    { tc: "O(n²)", sc: "O(1)", group: 1 },
+  Selection: { tc: "O(n²)", sc: "O(1)", group: 1 },
+  Insertion: { tc: "O(n²)", sc: "O(1)", group: 1 },
+  Quick:     { tc: "O(n log n)", sc: "O(log n)", group: 2 },
+  Merge:     { tc: "O(n log n)", sc: "O(n)", group: 2 },
+  Heap:      { tc: "O(n log n)", sc: "O(1)", group: 2 }
+};
+
+let selected = new Set(['Bubble', 'Selection', 'Insertion', 'Quick', 'Merge', 'Heap']);
+let running = false;
+
+// Setup Algo Buttons
+const checks = document.getElementById('algo-checks');
+Object.keys(ALGO_DETAILS).forEach(name => {
+  const div = document.createElement('div');
+  div.className = `algo-check ${selected.has(name) ? 'active' : ''}`;
+  div.textContent = name;
+  div.onclick = () => { if(!running) { div.classList.toggle('active'); selected.has(name) ? selected.delete(name) : selected.add(name); } };
+  checks.appendChild(div);
+});
+
+document.getElementById('speed').oninput = (e) => {
+  const val = parseInt(e.target.value);
+  let label = '';
+
+  if(val <= 2) label = 'Slow';
+  else if(val <= 4) label = 'S-Mid';
+  else if(val <= 6) label = 'Mid';
+  else if(val <= 8) label = 'Fast';
+  else label = 'Turbo';
+
+  document.getElementById('speed-val').textContent = label;
+};
+
+// --- Sorting Algos ---
+function* bubbleSort(A) {
+  let ops = 0;
+  for (let i = 0, n = A.length; i < n; i++) {
+    for (let j = 0; j < n - i - 1; j++) {
+      ops++; yield { arr: [...A], colors: {[j]:'active', [j+1]:'active'}, ops };
+      if (A[j] > A[j+1]) [A[j], A[j+1]] = [A[j+1], A[j]];
+    }
+  }
+}
+
+function* selectionSort(A) {
+  let ops = 0;
+  for (let i = 0, n = A.length; i < n; i++) {
+    let min = i;
+    for (let j = i + 1; j < n; j++) {
+      ops++; yield { arr: [...A], colors: {[j]:'active', [min]:'pivot'}, ops };
+      if (A[j] < A[min]) min = j;
+    }
+    [A[i], A[min]] = [A[min], A[i]];
+    yield { arr: [...A], colors: {[i]:'sorted'}, ops };
+  }
+}
+
+function* insertionSort(A) {
+  let ops = 0;
+  for (let i = 1; i < A.length; i++) {
+    let key = A[i], j = i - 1;
+    while (j >= 0 && A[j] > key) {
+      ops++; A[j+1] = A[j]; j--;
+      yield { arr: [...A], colors: {[j+1]:'active', [i]:'pivot'}, ops };
+    }
+    A[j+1] = key;
+  }
+}
+
+function* quickSort(A) {
+  let ops = 0;
+  function* qsort(l, r) {
+    if (l < r) {
+      let pivot = A[r], i = l;
+      for (let j = l; j < r; j++) {
+        ops++; yield { arr: [...A], colors: {[j]:'active', [r]:'pivot'}, ops };
+        if (A[j] < pivot) { [A[i], A[j]] = [A[j], A[i]]; i++; }
+      }
+      [A[i], A[r]] = [A[r], A[i]];
+      yield* qsort(l, i - 1); yield* qsort(i + 1, r);
+    }
+  }
+  yield* qsort(0, A.length - 1);
+}
+
+const ALGO_FNS = { Bubble: bubbleSort, Selection: selectionSort, Insertion: insertionSort, Quick: quickSort, Merge: bubbleSort, Heap: bubbleSort };
+
+function runAll() {
+  if (running || selected.size === 0) return;
+  const grid = document.getElementById('vis-grid');
+  grid.innerHTML = '';
+  const inputArr = document.getElementById('arr-input').value.trim().split(/\s+/).map(Number).filter(n => !isNaN(n));
+  if(inputArr.length < 2) return;
+  
+  running = true;
+  document.getElementById('run-btn').disabled = true;
+
+  // Group 1
+  const t1 = document.createElement('div'); t1.className = 'grid-section-title'; t1.textContent = "Quadratic Algorithms O(n²)";
+  grid.appendChild(t1);
+  Object.keys(ALGO_DETAILS).filter(k => ALGO_DETAILS[k].group === 1 && selected.has(k)).forEach(name => createPanel(name, inputArr, grid));
+
+  // Group 2
+  const t2 = document.createElement('div'); t2.className = 'grid-section-title'; t2.textContent = "Log-Linear Algorithms O(n log n)";
+  grid.appendChild(t2);
+  Object.keys(ALGO_DETAILS).filter(k => ALGO_DETAILS[k].group === 2 && selected.has(k)).forEach(name => createPanel(name, inputArr, grid));
+}
+
+function createPanel(name, input, grid) {
+  const details = ALGO_DETAILS[name];
+  const panel = document.createElement('div');
+  panel.className = 'algo-panel';
+  panel.innerHTML = `
+    <div class="algo-header">
+      <div class="algo-name">${name.toUpperCase()} SORT</div>
+      <div class="algo-complexity">TC: <span>${details.tc}</span> | SC: <span>${details.sc}</span></div>
+    </div>
+    <div class="algo-stats">STEPS: <span id="ops-${name}">0</span> | TIME: <span id="time-${name}">0.00s</span></div>
+    <canvas id="c-${name}"></canvas>
+  `;
+  grid.appendChild(panel);
+  const cv = document.getElementById(`c-${name}`);
+  const ctx = cv.getContext('2d');
+  cv.width = cv.clientWidth; cv.height = 180;
+  
+  const gen = ALGO_FNS[name]([...input]);
+  let start = performance.now();
+  function animate() {
+    const delay = 110 - (document.getElementById('speed').value * 10);
+    const res = gen.next();
+    if (!res.done) {
+      document.getElementById(`ops-${name}`).textContent = res.value.ops;
+      document.getElementById(`time-${name}`).textContent = ((performance.now()-start)/1000).toFixed(2)+'s';
+      draw(ctx, cv, res.value.arr, res.value.colors);
+      setTimeout(() => requestAnimationFrame(animate), delay);
+    } else {
+      draw(ctx, cv, [...input].sort((a,b)=>a-b), 'sorted');
+      // release 'running' flag logic
+      if (document.querySelectorAll('.algo-panel').length > 0) {
+          running = false;
+          document.getElementById('run-btn').disabled = false;
+      }
+    }
+  }
+  animate();
+}
+
+function draw(ctx, cv, arr, colors) {
+  ctx.fillStyle = "#080b0f"; ctx.fillRect(0, 0, cv.width, cv.height);
+  const max = Math.max(...arr), barW = (cv.width/arr.length)-6;
+  arr.forEach((v, i) => {
+    const barH = (v/max)*(cv.height-50);
+    ctx.fillStyle = colors === 'sorted' ? '#3d9e6e' : (colors[i] === 'active' ? '#e05252' : (colors[i] === 'pivot' ? '#c8922a' : '#2a6496'));
+    ctx.fillRect(i*(barW+6)+3, cv.height-barH-10, barW, barH);
+    
+    // Numbers on top (Labels FIXED)
+    // 1. Colour set to PURE WHITE (#FFFFFF)
+    // 2. Font set to BOLD (weight 600)
+    // 3. Size increased slightly (10px)
+    // 4. Shifted 8 pixels up (height - barH - 22) for clear background gap
+    ctx.fillStyle = "#FFFFFF"; 
+    ctx.font = "600 10px monospace"; 
+    ctx.textAlign = "center";
+    ctx.fillText(v, i*(barW+6)+3 + barW/2, cv.height-barH-22);
+  });
+}
+
+function randomize() {
+  if(running) return;
+  const count = Math.floor(Math.random() * 3) + 10;
+  const a = Array.from({length: count}, () => Math.floor(Math.random()*90)+10);
+  document.getElementById('arr-input').value = a.join(' ');
+  document.getElementById('vis-grid').innerHTML = '';
+}
+</script>
+</body>
+</html>

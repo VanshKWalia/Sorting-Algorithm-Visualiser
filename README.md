@@ -1,10 +1,71 @@
-# Sorting-Algorithm-Visualizer
-The Sorting Algorithm Visualizer is a Python program designed to visually demonstrate the workings of various sorting algorithms through interactive animations. It utilizes Tkinter for the graphical user interface (GUI) and Matplotlib for generating animated visualizations of sorting processes.
+# 🔥 Sort.viz — Sorting Algorithm Visualizer
 
-## Key Features
-- It is a GUI-based application to visualize various sorting algorithms using Python’s Tkinter and Matplotlib libraries.
-- Visualization : Created animated visualizations for each sorting algorithm. Used Matplotlib to update and display sorting
-steps dynamically. Enabled real-time tracking of operations and elapsed time.
-- GUI Development : Built an interactive interface with Tkinter. Allowed users to select sorting algorithms and animation
-speed. Implemented user-friendly controls for starting and customizing visualizations.
-- Technologies Used : Python, Tkinter, Matplotlib and NumPy
+An interactive and advanced Sorting Algorithm Visualizer with real-time animations built using **HTML, CSS, and JavaScript**.
+
+## 🚀 Features
+
+* Visualize multiple sorting algorithms
+* Real-time animation using Canvas
+* Adjustable speed control
+* Step counter and time tracking
+* Clean dark UI
+
+## 🧠 Algorithms Included
+
+* Bubble Sort
+* Selection Sort
+* Insertion Sort
+* Quick Sort
+* Merge Sort (placeholder)
+* Heap Sort (placeholder)
+
+## 🛠️ Tech Stack
+
+* HTML5
+* CSS3 (Custom Dark Theme)
+* JavaScript (ES6+)
+* Canvas API
+
+## ⚡ Key Concepts Used
+
+* Generator Functions (`function*`)
+* DOM Manipulation
+* Animation using `requestAnimationFrame`
+* Dynamic UI rendering
+* State management
+
+## 🚀 Highlights
+
+* Built using JavaScript generator functions for step-by-step execution
+* Real-time visualization using Canvas API
+* Dynamic speed control and UI interactions
+
+## 📸 Preview
+
+![Main UI](assets/main.png)
+![Sorting in Action](assets/animation.png)
+
+Sorting visualization with:
+* Color-coded comparisons
+* Pivot highlighting
+* Sorted state indication
+
+## ▶️ How to Run
+
+1. Download or clone the repo
+2. Open `index.html` in browser
+
+## 🎯 Future Improvements
+
+* Add Merge Sort & Heap Sort actual implementation
+* Add sound effects 🔊
+* Add step-by-step mode
+* Mobile optimization
+
+## 👨‍💻 Author
+
+**Vansh**
+DTU · CSE
+---
+
+⭐ If you like this project, give it a star!
