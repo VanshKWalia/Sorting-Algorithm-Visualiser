@@ -42,8 +42,8 @@ An interactive and advanced Sorting Algorithm Visualizer with real-time animatio
 
 ## 📸 Preview
 
-![Main UI](assets/main.png)
-![Sorting in Action](assets/animation.png)
+![Main UI](Assets/main.png)
+![Sorting in Action](Assets/animation.png)
 
 Sorting visualization with:
 * Color-coded comparisons
