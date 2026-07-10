@@ -61,7 +61,7 @@ Sorting visualization with:
 ## 🎯 Future Improvements
 
 * Add Merge Sort & Heap Sort actual implementation
-* Add sound effects 🔊
+* Add sound effects 
 * Add step-by-step mode
 * Mobile optimization
 
